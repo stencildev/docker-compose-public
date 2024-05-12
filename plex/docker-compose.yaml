@@ -1,0 +1,42 @@
+---
+# this stack will create two plex instances with two different IPs and databases
+#The content you will see is mounted at /plex1 and plex2. Change this to the directories on your host machine that have the content.
+services:
+  plex1:
+    image: plexinc/pms-docker
+    container_name: plex1
+    networks:
+      default:
+        ipv4_address: 192.168.1.0 #change to your IP
+    environment:
+      - TZ=America/Denver
+      - PLEX_CLAIM=
+    hostname: Plex1
+    volumes:
+      - ./plex-database1:/config
+      - ./transcode1:/transcode
+      - /plex1/:/plex
+    mem_limit: 4g  # Limit memory usage to 4GB
+    restart: always
+
+  plex2:
+    image: plexinc/pms-docker
+    container_name: plex2
+    networks:
+      default:
+        ipv4_address: 192.168.1.0 #change to your IP
+    environment:
+      - TZ=America/Denver
+      - PLEX_CLAIM=
+    hostname: Plex2
+    volumes:
+      - ./plex-database2:/config
+      - ./transcode2:/transcode
+      - /plex2/:/plex
+    mem_limit: 4g  # Limit memory usage to 4GB
+    restart: always
+
+networks:
+  default:
+    external: true
+    name: network #use the name of the network you created

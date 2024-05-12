@@ -1,0 +1,171 @@
+http:
+ #region routers 
+  routers:
+    proxmox:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`proxmox.local.example.com`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls:
+        certResolver: cloudflare
+      service: proxmox
+    pihole:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`pihole.local.example.com`)"
+      middlewares:
+        - redirectregex-pihole
+        - default-headers
+        - addprefix-pihole
+        - https-redirectscheme
+      tls:
+        certResolver: cloudflare
+      service: pihole
+    plexmain:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`plex-main.local.example.com`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls:
+        certResolver: cloudflare
+      service: plexmain
+    netbox:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`netbox.local.example.com`)"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      tls:
+        certResolver: cloudflare
+      service: netbox
+    authentik:
+      entryPoints:
+        - "websecure"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      rule: "Host(`authentik.local.example.com`)"
+      tls:
+        certResolver: cloudflare
+      service: authentik
+    portainer:
+      entryPoints:
+        - "websecure"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      rule: "Host(`portainer.local.example.com`)"
+      tls:
+        certResolver: cloudflare
+      service: portainer
+    jellyfinmain:
+      entryPoints:
+        - "websecure"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      rule: "Host(`jellyfinmain.local.example.com`)"
+      tls:
+        certResolver: cloudflare
+      service: jellyfinmain
+
+    peertube:
+      entryPoints:
+        - "websecure"
+      middlewares:
+        - default-headers
+        - https-redirectscheme
+      rule: "Host(`peertube.local.example.com`)"
+      tls:
+        certResolver: cloudflare
+      service: peertube
+
+#endregion
+#region services
+  services:
+    proxmox:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.1.0:8006" #replace with your IP and port number
+        passHostHeader: true
+    pihole:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.0:80" #replace with your IP and port number
+        passHostHeader: true
+    plexmain:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.1.0:32400" #replace with your IP and port number
+        passHostHeader: true
+    netbox:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.1.0:443" #replace with your IP and port number
+        passHostHeader: true
+    authentik:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.0:9000" #replace with your IP and port number
+        passHostHeader: true
+    portainer:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.1.0:9443" #replace with your IP and port number
+        passHostHeader: true
+    jellyfinmain:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.0:8096" #replace with your IP and port number
+        passHostHeader: true
+
+    peertube:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.1.0:9000" #replace with your IP and port number
+        passHostHeader: true
+    
+#endregion
+  middlewares:
+    addprefix-pihole:
+      addPrefix:
+        prefix: "/admin"
+    https-redirectscheme:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    redirectregex-pihole:
+      redirectRegex:
+        regex: "/admin/(.*)"
+        replacement: /
+
+    default-headers:
+      headers:
+        frameDeny: true
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+          
+    default-whitelist:
+      ipWhiteList:
+        sourceRange:
+        - "10.0.0.0/8"
+        - "192.168.0.0/16"
+        - "172.16.0.0/12"
+
+    secured:
+      chain:
+        middlewares:
+        - default-whitelist
+        - default-headers

@@ -1,0 +1,33 @@
+---
+services:
+  traefik:
+    image: docker.io/library/traefik:2.11.2 #use the version you will want to deploy or use :latest
+    container_name: traefik
+    networks:
+      default:
+        ipv4_address: 192.168.1.0 #use the ip you will be deploying in your environment.
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    environment:
+      - CF_DNS_API_TOKEN= #enter you token here do not leave a space between the = and the token. ex =sometokenhere123
+      # If you choose to use an API Key instead of a Token, specify your email as well
+      # - CF_API_EMAIL=user@example.com
+      # - CF_API_KEY=YOUR_API_KEY
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik.yaml:/traefik.yaml:ro
+      - ./acme.json:/acme.json
+      - ./config.yaml:/config.yaml:ro
+      - ./access.log:/var/log/traefik/access.log
+      - ./traefik.log:/var/log/traefik/traefik.log
+    restart: always
+
+networks:
+  default:
+    external: true
+    name: network #use the name of the network you created
