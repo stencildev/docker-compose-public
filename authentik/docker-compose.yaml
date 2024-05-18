@@ -4,7 +4,7 @@ services:
   postgresql:
     image: docker.io/library/postgres:12-alpine
     container_name: authentik-postgresql
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       start_period: 20s
@@ -25,7 +25,7 @@ services:
     image: docker.io/library/redis:alpine
     container_name: authentik-redis
     command: --save 60 1 --loglevel warning
-    restart: unless-stopped
+    restart: always
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       start_period: 20s
@@ -39,9 +39,9 @@ services:
         ipv4_address: 192.168.1.0 #change to your IP
 
   server:
-    image: ghcr.io/goauthentik/server:2024.2.3
+    image: ghcr.io/goauthentik/server:2024.4.2
     container_name: authentik-server
-    restart: unless-stopped
+    restart: always
     command: server
     environment:
       AUTHENTIK_REDIS__HOST: redis
@@ -65,9 +65,9 @@ services:
         ipv4_address: 192.168.1.0 #change to your IP
 
   worker:
-    image: ghcr.io/goauthentik/server:2024.2.3
+    image: ghcr.io/goauthentik/server:2024.4.2
     container_name: authentik-worker
-    restart: unless-stopped
+    restart: always
     command: worker
     environment:
       AUTHENTIK_REDIS__HOST: redis
