@@ -1,6 +1,6 @@
 services:
   portainer:
-    image: portainer/portainer-ce:2.19.4 #use the version you will want to deploy or use :latest
+    image: portainer/portainer-ce:2.21.3 #use the version you will want to deploy or use :latest
     container_name: portainer
     restart: always
     security_opt:
